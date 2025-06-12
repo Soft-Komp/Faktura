@@ -5,7 +5,7 @@
       <!-- Header -->
       <div class="flex items-center justify-between border-b pb-4 mb-4">
         <h3 class="text-lg font-medium text-gray-900">
-          {{ isEditMode ? 'Edytuj odbiorcę' : 'Dodaj nowego odbiorcę' }}
+          {{ isEditMode ? 'Edytuj artykuł' : 'Dodaj nowy artykuł' }}
         </h3>
         <button
           @click="$emit('close')"
@@ -24,11 +24,11 @@
 
       <!-- Form -->
       <form @submit.prevent="handleSubmit" class="space-y-4">
-        <!-- Nazwa -->
+        <!-- Nazwa i kod -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label for="nazwa" class="block text-sm font-medium text-gray-700 mb-2">
-              Nazwa skrócona *
+              Nazwa artykułu *
             </label>
             <input
               id="nazwa"
@@ -42,151 +42,132 @@
           </div>
 
           <div>
-            <label for="nazwa_pelna" class="block text-sm font-medium text-gray-700 mb-2">
-              Nazwa pełna *
+            <label for="kod_artykulu" class="block text-sm font-medium text-gray-700 mb-2">
+              Kod artykułu *
             </label>
             <input
-              id="nazwa_pelna"
-              v-model="form.nazwa_pelna"
+              id="kod_artykulu"
+              v-model="form.kod_artykulu"
               type="text"
               required
               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              :class="{ 'border-red-300': errors.nazwa_pelna }"
+              :class="{ 'border-red-300': errors.kod_artykulu }"
             />
-            <div v-if="errors.nazwa_pelna" class="text-red-500 text-xs mt-1">{{ errors.nazwa_pelna[0] }}</div>
+            <div v-if="errors.kod_artykulu" class="text-red-500 text-xs mt-1">{{ errors.kod_artykulu[0] }}</div>
           </div>
         </div>
 
-        <!-- Adres -->
-        <div>
-          <label for="adres" class="block text-sm font-medium text-gray-700 mb-2">
-            Adres *
-          </label>
-          <input
-            id="adres"
-            v-model="form.adres"
-            type="text"
-            required
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            :class="{ 'border-red-300': errors.adres }"
-          />
-          <div v-if="errors.adres" class="text-red-500 text-xs mt-1">{{ errors.adres[0] }}</div>
-        </div>
-
-        <!-- Kod pocztowy i miejscowość -->
+        <!-- Jednostka i stawka VAT -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label for="kod_pocztowy" class="block text-sm font-medium text-gray-700 mb-2">
-              Kod pocztowy *
-            </label>
-            <input
-              id="kod_pocztowy"
-              v-model="form.kod_pocztowy"
-              type="text"
-              required
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              :class="{ 'border-red-300': errors.kod_pocztowy }"
-            />
-            <div v-if="errors.kod_pocztowy" class="text-red-500 text-xs mt-1">{{ errors.kod_pocztowy[0] }}</div>
-          </div>
-
-          <div>
-            <label for="miejscowosc" class="block text-sm font-medium text-gray-700 mb-2">
-              Miejscowość *
-            </label>
-            <input
-              id="miejscowosc"
-              v-model="form.miejscowosc"
-              type="text"
-              required
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              :class="{ 'border-red-300': errors.miejscowosc }"
-            />
-            <div v-if="errors.miejscowosc" class="text-red-500 text-xs mt-1">{{ errors.miejscowosc[0] }}</div>
-          </div>
-        </div>
-
-        <!-- NIP i typ odbiorcy -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label for="nip" class="block text-sm font-medium text-gray-700 mb-2">
-              NIP
-            </label>
-            <input
-              id="nip"
-              v-model="form.nip"
-              type="text"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              :class="{ 'border-red-300': errors.nip }"
-            />
-            <div v-if="errors.nip" class="text-red-500 text-xs mt-1">{{ errors.nip[0] }}</div>
-          </div>
-
-          <div>
-            <label for="typ_odbiorcy" class="block text-sm font-medium text-gray-700 mb-2">
-              Typ odbiorcy *
+            <label for="jednostka" class="block text-sm font-medium text-gray-700 mb-2">
+              Jednostka *
             </label>
             <select
-              id="typ_odbiorcy"
-              v-model="form.typ_odbiorcy"
+              id="jednostka"
+              v-model="form.jednostka"
               required
               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              :class="{ 'border-red-300': errors.typ_odbiorcy }"
+              :class="{ 'border-red-300': errors.jednostka }"
             >
-              <option value="">Wybierz typ</option>
-              <option value="krajowy">Krajowy</option>
-              <option value="ue">UE</option>
-              <option value="pozaue">Poza UE</option>
+              <option value="szt.">szt.</option>
+              <option value="kg">kg</option>
+              <option value="m">m</option>
+              <option value="m2">m²</option>
+              <option value="m3">m³</option>
+              <option value="l">l</option>
+              <option value="godz.">godz.</option>
+              <option value="usł.">usł.</option>
             </select>
-            <div v-if="errors.typ_odbiorcy" class="text-red-500 text-xs mt-1">{{ errors.typ_odbiorcy[0] }}</div>
+            <div v-if="errors.jednostka" class="text-red-500 text-xs mt-1">{{ errors.jednostka[0] }}</div>
+          </div>
+
+          <div>
+            <label for="stawka_vat" class="block text-sm font-medium text-gray-700 mb-2">
+              Stawka VAT (%) *
+            </label>
+            <select
+              id="stawka_vat"
+              v-model="form.stawka_vat"
+              required
+              @change="calculateBrutto"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              :class="{ 'border-red-300': errors.stawka_vat }"
+            >
+              <option value="0">0%</option>
+              <option value="5">5%</option>
+              <option value="8">8%</option>
+              <option value="23">23%</option>
+            </select>
+            <div v-if="errors.stawka_vat" class="text-red-500 text-xs mt-1">{{ errors.stawka_vat[0] }}</div>
           </div>
         </div>
 
-        <!-- Telefon i email -->
+        <!-- Ceny -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label for="telefon" class="block text-sm font-medium text-gray-700 mb-2">
-              Telefon
+            <label for="cena_netto" class="block text-sm font-medium text-gray-700 mb-2">
+              Cena netto (PLN) *
             </label>
             <input
-              id="telefon"
-              v-model="form.telefon"
-              type="text"
+              id="cena_netto"
+              v-model="form.cena_netto"
+              type="number"
+              step="0.01"
+              min="0"
+              required
+              @input="calculateBrutto"
               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              :class="{ 'border-red-300': errors.telefon }"
+              :class="{ 'border-red-300': errors.cena_netto }"
             />
-            <div v-if="errors.telefon" class="text-red-500 text-xs mt-1">{{ errors.telefon[0] }}</div>
+            <div v-if="errors.cena_netto" class="text-red-500 text-xs mt-1">{{ errors.cena_netto[0] }}</div>
           </div>
 
           <div>
-            <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
-              Email
+            <label for="cena_brutto" class="block text-sm font-medium text-gray-700 mb-2">
+              Cena brutto (PLN) *
             </label>
             <input
-              id="email"
-              v-model="form.email"
-              type="email"
+              id="cena_brutto"
+              v-model="form.cena_brutto"
+              type="number"
+              step="0.01"
+              min="0"
+              required
+              @input="calculateNetto"
               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              :class="{ 'border-red-300': errors.email }"
+              :class="{ 'border-red-300': errors.cena_brutto }"
             />
-            <div v-if="errors.email" class="text-red-500 text-xs mt-1">{{ errors.email[0] }}</div>
+            <div v-if="errors.cena_brutto" class="text-red-500 text-xs mt-1">{{ errors.cena_brutto[0] }}</div>
           </div>
         </div>
 
-        <!-- Kraj -->
+        <!-- Opis -->
         <div>
-          <label for="kraj" class="block text-sm font-medium text-gray-700 mb-2">
-            Kraj *
+          <label for="opis" class="block text-sm font-medium text-gray-700 mb-2">
+            Opis
           </label>
-          <input
-            id="kraj"
-            v-model="form.kraj"
-            type="text"
-            required
+          <textarea
+            id="opis"
+            v-model="form.opis"
+            rows="3"
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            :class="{ 'border-red-300': errors.kraj }"
+            :class="{ 'border-red-300': errors.opis }"
+          ></textarea>
+          <div v-if="errors.opis" class="text-red-500 text-xs mt-1">{{ errors.opis[0] }}</div>
+        </div>
+
+        <!-- Aktywny -->
+        <div class="flex items-center">
+          <input
+            id="aktywny"
+            v-model="form.aktywny"
+            type="checkbox"
+            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
           />
-          <div v-if="errors.kraj" class="text-red-500 text-xs mt-1">{{ errors.kraj[0] }}</div>
+          <label for="aktywny" class="ml-2 block text-sm text-gray-900">
+            Artykuł aktywny
+          </label>
         </div>
 
         <!-- Buttons -->
@@ -214,12 +195,12 @@
 
 <script>
 import { ref, computed, watch } from 'vue';
-import { useOdbiorcyStore } from '../../stores/odbiorcy';
+import { useArtykulyStore } from '../../stores/artykuly';
 
 export default {
-  name: 'OdbiorcaModal',
+  name: 'ArtykulModal',
   props: {
-    odbiorca: {
+    artykul: {
       type: Object,
       default: null
     },
@@ -230,20 +211,18 @@ export default {
   },
   emits: ['close', 'saved'],
   setup(props, { emit }) {
-    const odbiorcyStore = useOdbiorcyStore();
+    const artykulyStore = useArtykulyStore();
     
     // Form state
     const form = ref({
       nazwa: '',
-      nazwa_pelna: '',
-      kod_pocztowy: '',
-      miejscowosc: '',
-      adres: '',
-      nip: '',
-      telefon: '',
-      email: '',
-      kraj: 'Polska',
-      typ_odbiorcy: ''
+      kod_artykulu: '',
+      jednostka: 'szt.',
+      stawka_vat: '23',
+      cena_netto: '',
+      cena_brutto: '',
+      opis: '',
+      aktywny: true
     });
     
     const errors = ref({});
@@ -251,24 +230,38 @@ export default {
     const error = ref(null);
     
     // Computed
-    const isEditMode = computed(() => props.isEdit && props.odbiorca);
+    const isEditMode = computed(() => props.isEdit && props.artykul);
     
     // Methods
     const resetForm = () => {
       form.value = {
         nazwa: '',
-        nazwa_pelna: '',
-        kod_pocztowy: '',
-        miejscowosc: '',
-        adres: '',
-        nip: '',
-        telefon: '',
-        email: '',
-        kraj: 'Polska',
-        typ_odbiorcy: ''
+        kod_artykulu: '',
+        jednostka: 'szt.',
+        stawka_vat: '23',
+        cena_netto: '',
+        cena_brutto: '',
+        opis: '',
+        aktywny: true
       };
       errors.value = {};
       error.value = null;
+    };
+    
+    const calculateBrutto = () => {
+      if (form.value.cena_netto && form.value.stawka_vat) {
+        const netto = parseFloat(form.value.cena_netto);
+        const vat = parseFloat(form.value.stawka_vat);
+        form.value.cena_brutto = (netto * (1 + vat / 100)).toFixed(2);
+      }
+    };
+    
+    const calculateNetto = () => {
+      if (form.value.cena_brutto && form.value.stawka_vat) {
+        const brutto = parseFloat(form.value.cena_brutto);
+        const vat = parseFloat(form.value.stawka_vat);
+        form.value.cena_netto = (brutto / (1 + vat / 100)).toFixed(2);
+      }
     };
     
     const handleSubmit = async () => {
@@ -280,9 +273,9 @@ export default {
         let result;
         
         if (isEditMode.value) {
-          result = await odbiorcyStore.updateOdbiorca(props.odbiorca.id, form.value);
+          result = await artykulyStore.updateArtykul(props.artykul.id, form.value);
         } else {
-          result = await odbiorcyStore.createOdbiorca(form.value);
+          result = await artykulyStore.createArtykul(form.value);
         }
         
         if (result.success) {
@@ -301,9 +294,9 @@ export default {
     };
     
     // Watch
-    watch(() => props.odbiorca, (newOdbiorca) => {
-      if (newOdbiorca) {
-        form.value = { ...newOdbiorca };
+    watch(() => props.artykul, (newArtykul) => {
+      if (newArtykul) {
+        form.value = { ...newArtykul };
       } else {
         resetForm();
       }
@@ -315,6 +308,8 @@ export default {
       loading,
       error,
       isEditMode,
+      calculateBrutto,
+      calculateNetto,
       handleSubmit
     };
   }

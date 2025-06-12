@@ -31,20 +31,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/profile', [AuthController::class, 'updateProfile']);
 
     // Dokumenty handlowe
-    Route::get('/dokumenty', [DokumentHandlowyController::class, 'index']);
-    Route::post('/dokumenty', [DokumentHandlowyController::class, 'store']);
-    Route::get('/dokumenty/{id}', [DokumentHandlowyController::class, 'show']);
-    Route::put('/dokumenty/{id}', [DokumentHandlowyController::class, 'update']);
-    Route::delete('/dokumenty/{id}', [DokumentHandlowyController::class, 'destroy']);
+    Route::apiResource('dokumenty', DokumentHandlowyController::class);
     Route::post('/dokumenty/{id}/pdf', [DokumentHandlowyController::class, 'generatePdf']);
     Route::post('/dokumenty/{id}/email', [DokumentHandlowyController::class, 'sendEmail']);
 
     // Firmy
-    Route::get('/firmy', [FirmaController::class, 'index']);
-    Route::post('/firmy', [FirmaController::class, 'store']);
-    Route::get('/firmy/{id}', [FirmaController::class, 'show']);
-    Route::put('/firmy/{id}', [FirmaController::class, 'update']);
-    Route::delete('/firmy/{id}', [FirmaController::class, 'destroy']);
+    Route::apiResource('firmy', FirmaController::class);
     
     // Zarządzanie klientami (tylko dla firm księgowych)
     Route::middleware('check.permissions:ksiegowy,admin')->group(function () {
@@ -53,18 +45,10 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     // Odbiorcy
-    Route::get('/odbiorcy', [OdbiorcaController::class, 'index']);
-    Route::post('/odbiorcy', [OdbiorcaController::class, 'store']);
-    Route::get('/odbiorcy/{id}', [OdbiorcaController::class, 'show']);
-    Route::put('/odbiorcy/{id}', [OdbiorcaController::class, 'update']);
-    Route::delete('/odbiorcy/{id}', [OdbiorcaController::class, 'destroy']);
+    Route::apiResource('odbiorcy', OdbiorcaController::class);
 
     // Artykuły
-    Route::get('/artykuly', [ArtykulController::class, 'index']);
-    Route::post('/artykuly', [ArtykulController::class, 'store']);
-    Route::get('/artykuly/{id}', [ArtykulController::class, 'show']);
-    Route::put('/artykuly/{id}', [ArtykulController::class, 'update']);
-    Route::delete('/artykuly/{id}', [ArtykulController::class, 'destroy']);
+    Route::apiResource('artykuly', ArtykulController::class);
 
     // Statystyki
     Route::get('/stats', [StatsController::class, 'index']);
