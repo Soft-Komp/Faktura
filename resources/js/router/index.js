@@ -47,6 +47,12 @@ const routes = [
         name: 'Dokumenty',
         component: () => import('../views/Dokumenty/Index.vue'),
         meta: { requiresAuth: true }
+    },
+    {
+        path: '/users',
+        name: 'Users',
+        component: () => import('../views/Users/Index.vue'),
+        meta: { requiresAuth: true, adminOnly: true }
     }
 ];
 
@@ -63,6 +69,8 @@ router.beforeEach((to, from, next) => {
         next('/login');
     } else if (to.meta.guest && authStore.isAuthenticated) {
         next('/dashboard');
+    } else if (to.meta.adminOnly && !authStore.isAdmin) {
+        next('/dashboard'); // Przekieruj do dashboard jeśli nie admin
     } else {
         next();
     }

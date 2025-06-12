@@ -203,7 +203,7 @@
 </template>
 
 <script>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import { useFirmyStore } from '../../stores/firmy';
 import { useAuthStore } from '../../stores/auth';
 import FirmaModal from '../../components/Firmy/FirmaModal.vue';

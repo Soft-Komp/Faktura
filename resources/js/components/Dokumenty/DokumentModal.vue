@@ -114,7 +114,7 @@
                 :class="{ 'border-red-300': errors.id_firma }"
               >
                 <option value="">Wybierz firmę</option>
-                <option :value="authStore.userFirma.id">{{ authStore.userFirma.nazwa }} (Moja firma)</option>
+                <option v-if="authStore.userFirma" :value="authStore.userFirma.id">{{ authStore.userFirma.nazwa }} (Moja firma)</option>
                 <option 
                   v-for="klient in dostepneKlienci" 
                   :key="klient.id" 
@@ -124,6 +124,17 @@
                 </option>
               </select>
               <div v-if="errors.id_firma" class="text-red-500 text-xs mt-1">{{ errors.id_firma[0] }}</div>
+            </div>
+            
+            <div v-else>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Wystawiasz jako:</label>
+              <div class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-900">
+                {{ authStore.userFirma ? authStore.userFirma.nazwa : 'Ładowanie danych firmy...' }}
+              </div>
+              <!-- Debug info - usuń to po naprawieniu -->
+              <div class="text-xs text-gray-500 mt-1">
+                Debug: user.firma_id = {{ authStore.user?.firma_id }}, userFirma = {{ authStore.userFirma ? 'loaded' : 'null' }}
+              </div>
             </div>
 
             <div>
@@ -412,7 +423,7 @@ export default {
       data_wystawienia: new Date().toISOString().split('T')[0],
       termin_platnosci: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       miejsce_wystawienia: '',
-      id_firma: authStore.userFirma?.id || '',
+      id_firma: authStore.userFirma?.id || null,
       id_odbiorca: '',
       waluta: 'PLN',
       kurs_waluty: 1,
@@ -503,6 +514,11 @@ export default {
       error.value = null;
       
       try {
+        // Ustaw domyślną firmę jeśli nie wybrano
+        if (!form.value.id_firma && authStore.userFirma?.id) {
+          form.value.id_firma = authStore.userFirma.id;
+        }
+        
         let result;
         
         if (isEditMode.value) {
@@ -534,9 +550,19 @@ export default {
         authStore.isKsiegowy ? firmyStore.fetchKlienci() : Promise.resolve()
       ]);
       
-      // Set default miejsce_wystawienia
+      // Upewnij się, że dane użytkownika są załadowane
+      if (!authStore.userFirma && authStore.user?.firma_id) {
+        await authStore.fetchProfile();
+      }
+      
+      // Set default values
       if (authStore.userFirma?.miejsce_wystawienia) {
         form.value.miejsce_wystawienia = authStore.userFirma.miejsce_wystawienia;
+      }
+      
+      // Ustaw domyślną firmę
+      if (authStore.userFirma?.id) {
+        form.value.id_firma = authStore.userFirma.id;
       }
     };
     

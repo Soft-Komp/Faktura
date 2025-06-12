@@ -6,6 +6,7 @@ use App\Http\Controllers\API\FirmaController;
 use App\Http\Controllers\API\OdbiorcaController;
 use App\Http\Controllers\API\StatsController;
 use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -52,4 +53,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Statystyki
     Route::get('/stats', [StatsController::class, 'index']);
+
+    // Zarządzanie użytkownikami (tylko admin)
+    Route::middleware('check.permissions:admin')->group(function () {
+        Route::apiResource('users', UserController::class);
+        Route::post('/users/{id}/assign-firma', [UserController::class, 'assignToFirma']);
+        Route::post('/users/{id}/detach-firma', [UserController::class, 'detachFromFirma']);
+        Route::post('/users/{id}/change-role', [UserController::class, 'changeRole']);
+    });
 });
