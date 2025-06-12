@@ -14,7 +14,7 @@ export const useAuthStore = defineStore('auth', {
         isAdmin: (state) => state.user?.rola === 'admin',
         isKsiegowy: (state) => state.user?.rola === 'ksiegowy',
         isKlient: (state) => state.user?.rola === 'klient',
-        userFirma: (state) => state.user?.firma
+        userFirma: (state) => state.user?.firma || null
     },
 
     actions: {
@@ -82,20 +82,42 @@ export const useAuthStore = defineStore('auth', {
         },
 
         async fetchProfile() {
-            if (!this.token) return;
+            if (!this.token) return { success: false, error: 'Brak tokenu' };
+            
+            this.loading = true;
+            this.error = null;
             
             try {
                 const response = await axios.get('/profile');
                 if (response.data.success) {
                     this.user = response.data.data;
                     localStorage.setItem('user', JSON.stringify(this.user));
+                    return { success: true, data: this.user };
                 }
             } catch (error) {
                 console.error('Błąd pobierania profilu:', error);
+                this.error = error.response?.data?.message || 'Błąd pobierania profilu';
                 if (error.response?.status === 401) {
                     this.logout();
                 }
+                return { success: false, error: this.error };
+            } finally {
+                this.loading = false;
             }
+        },
+
+        // Inicjalizacja danych użytkownika przy starcie aplikacji
+        async initializeAuth() {
+            if (this.token && this.user) {
+                // Jeśli użytkownik ma firmę przypisaną ale brak danych firmy, pobierz profil
+                if (this.user.firma_id && !this.user.firma) {
+                    await this.fetchProfile();
+                }
+            }
+        },
+
+        clearError() {
+            this.error = null;
         }
     }
 });

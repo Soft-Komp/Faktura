@@ -129,11 +129,7 @@
             <div v-else>
               <label class="block text-sm font-medium text-gray-700 mb-2">Wystawiasz jako:</label>
               <div class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-900">
-                {{ authStore.userFirma ? authStore.userFirma.nazwa : 'Ładowanie danych firmy...' }}
-              </div>
-              <!-- Debug info - usuń to po naprawieniu -->
-              <div class="text-xs text-gray-500 mt-1">
-                Debug: user.firma_id = {{ authStore.user?.firma_id }}, userFirma = {{ authStore.userFirma ? 'loaded' : 'null' }}
+                {{ firmaNazwa }}
               </div>
             </div>
 
@@ -423,7 +419,7 @@ export default {
       data_wystawienia: new Date().toISOString().split('T')[0],
       termin_platnosci: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       miejsce_wystawienia: '',
-      id_firma: authStore.userFirma?.id || null,
+      id_firma: null,
       id_odbiorca: '',
       waluta: 'PLN',
       kurs_waluty: 1,
@@ -441,6 +437,13 @@ export default {
     const dostepniOdbiorcy = computed(() => odbiorcyStore.odbiorcy);
     const dostepneArtykuly = computed(() => artykulyStore.artykulyAktywne);
     const dostepneKlienci = computed(() => firmyStore.klienci);
+    
+    const firmaNazwa = computed(() => {
+      if (authStore.userFirma) {
+        return authStore.userFirma.nazwa;
+      }
+      return 'Ładowanie danych firmy...';
+    });
     
     const totalNetto = computed(() => {
       return form.value.pozycje.reduce((sum, p) => sum + parseFloat(p.wartosc_netto_pozycji || 0), 0);
@@ -544,24 +547,24 @@ export default {
     
     // Load data
     const loadData = async () => {
+      // Najpierw sprawdź dane użytkownika
+      if (!authStore.userFirma && authStore.user?.firma_id) {
+        await authStore.fetchProfile();
+      }
+      
       await Promise.all([
         odbiorcyStore.fetchOdbiorcy(),
         artykulyStore.fetchArtykuly(),
         authStore.isKsiegowy ? firmyStore.fetchKlienci() : Promise.resolve()
       ]);
       
-      // Upewnij się, że dane użytkownika są załadowane
-      if (!authStore.userFirma && authStore.user?.firma_id) {
-        await authStore.fetchProfile();
-      }
-      
-      // Set default values
-      if (authStore.userFirma?.miejsce_wystawienia) {
+      // Set default values po załadowaniu danych
+      if (authStore.userFirma?.miejsce_wystawienia && !form.value.miejsce_wystawienia) {
         form.value.miejsce_wystawienia = authStore.userFirma.miejsce_wystawienia;
       }
       
-      // Ustaw domyślną firmę
-      if (authStore.userFirma?.id) {
+      // Ustaw domyślną firmę tylko jeśli nie została jeszcze ustawiona
+      if (authStore.userFirma?.id && !form.value.id_firma) {
         form.value.id_firma = authStore.userFirma.id;
       }
     };
@@ -573,6 +576,16 @@ export default {
           ...newDokument,
           pozycje: newDokument.pozycje || []
         };
+      }
+    }, { immediate: true });
+    
+    // Watch dla danych firmy użytkownika
+    watch(() => authStore.userFirma, (newFirma) => {
+      if (newFirma && !form.value.id_firma) {
+        form.value.id_firma = newFirma.id;
+        if (newFirma.miejsce_wystawienia && !form.value.miejsce_wystawienia) {
+          form.value.miejsce_wystawienia = newFirma.miejsce_wystawienia;
+        }
       }
     }, { immediate: true });
     
@@ -594,6 +607,7 @@ export default {
       dostepniOdbiorcy,
       dostepneArtykuly,
       dostepneKlienci,
+      firmaNazwa,
       totalNetto,
       totalVat,
       totalBrutto,

@@ -6,6 +6,7 @@
 </template>
 
 <script>
+import { onMounted } from 'vue';
 import { useAuthStore } from './stores/auth';
 import AppLayout from './components/Layout/AppLayout.vue';
 
@@ -17,10 +18,12 @@ export default {
   setup() {
     const authStore = useAuthStore();
     
-    // Sprawdź token przy starcie aplikacji
-    if (authStore.token) {
-      authStore.fetchProfile();
-    }
+    // Inicjalizuj auth przy starcie aplikacji
+    onMounted(async () => {
+      if (authStore.token) {
+        await authStore.initializeAuth();
+      }
+    });
     
     return {
       authStore
