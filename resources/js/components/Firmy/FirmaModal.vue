@@ -209,20 +209,26 @@
         </div>
 
         <!-- Typ firmy -->
-        <div v-if="!isEditMode">
+<div>
           <label for="typ" class="block text-sm font-medium text-gray-700 mb-2">
             Typ firmy
           </label>
           <select
-            id="typ"
-            v-model="form.typ"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            :class="{ 'border-red-300': errors.typ }"
-          >
-            <option value="zwykla">Zwykła</option>
-            <option value="ksiegowa">Księgowa</option>
-          </select>
-          <div v-if="errors.typ" class="text-red-500 text-xs mt-1">{{ errors.typ[0] }}</div>
+  id="typ"
+  v-model="form.typ"
+  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+  :class="{ 'border-red-300': errors.typ }"
+>
+  <option value="zwykla">Zwykła</option>
+  <option value="ksiegowa">Księgowa</option>
+  <option value="klient">Klient</option>
+</select>
+<div v-if="errors.typ" class="text-red-500 text-xs mt-1">{{ errors.typ[0] }}</div>
+<p class="text-xs text-gray-500 mt-1">
+  <span v-if="form.typ === 'ksiegowa'">Firma księgowa może zarządzać klientami</span>
+  <span v-else-if="form.typ === 'klient'">Firma klient jest obsługiwana przez firmę księgową</span>
+  <span v-else>Zwykła firma działająca samodzielnie</span>
+</p>
         </div>
 
         <!-- Buttons -->

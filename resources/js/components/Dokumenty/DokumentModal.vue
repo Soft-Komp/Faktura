@@ -557,7 +557,7 @@ export default {
     
     // Load data
     const loadData = async () => {
-      // Najpierw sprawdź dane użytkownika
+      // Najpierw sprawdź dane użytkownika i odśwież je jeśli potrzeba
       if (!authStore.userFirma && authStore.user?.firma_id) {
         await authStore.fetchProfile();
       }

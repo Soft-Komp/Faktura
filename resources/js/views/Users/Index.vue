@@ -233,8 +233,7 @@
                 </button>
 
                 <div v-if="activeUserActions === user.id" 
-                     class="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10">
-                  <div class="py-1">
+     class="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50">  <div class="py-1">
                     <button
                       @click="editUser(user)"
                       class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -445,20 +444,47 @@ export default {
       selectedUser.value = null;
     };
     
-    const onUserSaved = () => {
-      closeModal();
-      fetchUsers();
-    };
+    const onUserSaved = async () => {
+  // Zapisz ID edytowanego użytkownika
+  const editedUserId = selectedUser.value?.id;
+  
+  closeModal();
+  fetchUsers();
+  
+  // Jeśli edytowano dane aktualnie zalogowanego użytkownika
+  if (editedUserId === authStore.user?.id) {
+    await authStore.fetchProfile();
+    // Opcjonalnie: przeładuj stronę dla pewności
+    // window.location.reload();
+  }
+};
     
-    const onFirmaAssigned = () => {
-      showAssignFirmaModal.value = false;
-      selectedUser.value = null;
-    };
+    const onFirmaAssigned = async () => {
+  // Zapisz ID użytkownika przed zamknięciem modala
+  const userId = selectedUser.value?.id;
+  
+  showAssignFirmaModal.value = false;
+  selectedUser.value = null;
+  await fetchUsers();
+  
+  // Jeśli zmieniono firmę dla aktualnie zalogowanego użytkownika
+  if (userId === authStore.user?.id) {
+    await authStore.fetchProfile();
+    // Wymuś ponowne renderowanie komponentów
+    window.location.reload();
+  }
+};
+
+const onRoleChanged = async () => {
+    showChangeRoleModal.value = false;
+    selectedUser.value = null;
+    await fetchUsers(); // Odśwież listę użytkowników
     
-    const onRoleChanged = () => {
-      showChangeRoleModal.value = false;
-      selectedUser.value = null;
-    };
+    // Jeśli zmieniono rolę dla aktualnie zalogowanego użytkownika
+    if (selectedUser.value?.id === authStore.user?.id) {
+        await authStore.refreshUserData();
+    }
+};
     
     const getRoleLabel = (role) => {
       const labels = {

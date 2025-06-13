@@ -294,10 +294,20 @@ export default {
       selectedFirma.value = null;
     };
     
-    const onFirmaSaved = () => {
-      closeModal();
-      fetchData();
-    };
+    const onFirmaSaved = async () => {
+  // Zapisz ID edytowanej firmy przed zamknięciem modala
+  const editedFirmaId = selectedFirma.value?.id;
+  
+  closeModal();
+  fetchData();
+  
+  // Jeśli edytowano firmę aktualnie zalogowanego użytkownika
+  if (editedFirmaId === authStore.user?.firma_id) {
+    await authStore.fetchProfile();
+    // Opcjonalnie: wymuś przeładowanie strony dla pewności
+    // window.location.reload();
+  }
+};
     
     const onKlientSaved = () => {
       showCreateKlientModal.value = false;

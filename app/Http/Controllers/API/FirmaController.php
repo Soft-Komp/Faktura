@@ -65,6 +65,7 @@ public function dodajKlienta(Request $request)
         'email' => 'required|email|max:100',
         'waluta_domyslna' => 'required|string|max:3',
         'prefix_faktury' => 'required|string|max:10',
+        'typ' => 'sometimes|in:ksiegowa,klient,zwykla',
     ]);
     
     if ($validator->fails()) {
@@ -110,6 +111,7 @@ public function dodajKlienta(Request $request)
             'email' => 'required|email|max:100',
             'waluta_domyslna' => 'required|max:3',
             'prefix_faktury' => 'required|max:10',
+            'typ' => 'sometimes|in:ksiegowa,klient,zwykla',
         ]);
 
         if ($validator->fails()) {
