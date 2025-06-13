@@ -110,6 +110,7 @@
                 id="id_firma"
                 v-model="form.id_firma"
                 required
+                @change="onFirmaChange"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 :class="{ 'border-red-300': errors.id_firma }"
               >
@@ -511,6 +512,15 @@ export default {
       return parseFloat(price || 0).toFixed(2);
     };
     
+    const onFirmaChange = async () => {
+      // Odśwież artykuły po zmianie firmy
+      await loadArtykuly();
+    };
+    
+    const loadArtykuly = async () => {
+      await artykulyStore.fetchArtykuly();
+    };
+    
     const handleSubmit = async () => {
       loading.value = true;
       errors.value = {};
@@ -554,7 +564,7 @@ export default {
       
       await Promise.all([
         odbiorcyStore.fetchOdbiorcy(),
-        artykulyStore.fetchArtykuly(),
+        loadArtykuly(),
         authStore.isKsiegowy ? firmyStore.fetchKlienci() : Promise.resolve()
       ]);
       
@@ -589,6 +599,22 @@ export default {
       }
     }, { immediate: true });
     
+    // Watch zmiany użytkownika - odśwież profil jeśli potrzeba
+    watch(() => authStore.user?.firma_id, async (newFirmaId, oldFirmaId) => {
+      if (newFirmaId && newFirmaId !== oldFirmaId) {
+        await authStore.fetchProfile();
+        await loadArtykuly(); // Przeładuj artykuły dla nowej firmy
+        
+        // Aktualizuj formularz
+        if (authStore.userFirma?.id) {
+          form.value.id_firma = authStore.userFirma.id;
+          if (authStore.userFirma.miejsce_wystawienia) {
+            form.value.miejsce_wystawienia = authStore.userFirma.miejsce_wystawienia;
+          }
+        }
+      }
+    });
+    
     // Lifecycle
     onMounted(() => {
       loadData();
@@ -616,6 +642,7 @@ export default {
       selectArtykul,
       calculatePozycja,
       formatPrice,
+      onFirmaChange,
       handleSubmit
     };
   }

@@ -1,61 +1,326 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# System Fakturowania dla Biur Rachunkowych
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Profesjonalna aplikacja webowa do wystawiania faktur dla biur rachunkowych i ich klientów, zbudowana w Laravel + Vue.js 3.
 
-## About Laravel
+## 🛠️ Stack Technologiczny
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **Backend:** Laravel (najnowsza stabilna wersja)
+- **Frontend:** Vue.js 3 z Composition API
+- **Baza danych:** MariaDB/MySQL
+- **Architektura:** RESTful API + SPA
+- **Stylowanie:** Tailwind CSS
+- **State Management:** Pinia
+- **Autentykacja:** Laravel Sanctum
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## ⚡ Wymagania Systemowe
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- PHP 8.1 lub nowszy
+- Composer
+- Node.js 16+ i npm
+- MariaDB/MySQL 8.0+
+- Git
 
-## Learning Laravel
+## 🚀 Instalacja i Uruchomienie
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 1. Klonowanie Repozytorium
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+```bash
+git clone [adres-repozytorium]
+cd system-fakturowania
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 2. Instalacja Zależności Backend
 
-## Laravel Sponsors
+```bash
+# Instalacja pakietów PHP
+composer install
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+# Kopiowanie pliku konfiguracyjnego
+cp .env.example .env
 
-### Premium Partners
+# Generowanie klucza aplikacji
+php artisan key:generate
+```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### 3. Konfiguracja Bazy Danych
 
-## Contributing
+Edytuj plik `.env` i ustaw parametry bazy danych:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=system_fakturowania
+DB_USERNAME=twoja_nazwa_uzytkownika
+DB_PASSWORD=twoje_haslo
+```
 
-## Code of Conduct
+### 4. Migracje i Dane Testowe
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+# Utworzenie tabel w bazie danych
+php artisan migrate
 
-## Security Vulnerabilities
+# Opcjonalnie - dane testowe
+php artisan db:seed
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### 5. Konfiguracja Sanctum
 
-## License
+```bash
+# Publikacja konfiguracji Sanctum
+php artisan vendor:publish --provider="Laravel\Sanctum\SanctumServiceProvider"
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+# Dodanie middleware do kernel (jeśli nie ma)
+# Sprawdź app/Http/Kernel.php czy zawiera:
+# 'api' => [
+#     \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+# ],
+```
+
+### 6. Instalacja Zależności Frontend
+
+```bash
+# Instalacja pakietów npm
+npm install
+
+# Kompilacja assetów (development)
+npm run dev
+```
+
+### 7. Uruchomienie Aplikacji
+
+**Terminal 1 - Backend:**
+```bash
+php artisan serve
+```
+
+**Terminal 2 - Frontend (w trybie development):**
+```bash
+npm run dev
+```
+
+**Aplikacja będzie dostępna pod adresem:** `http://localhost:8000`
+
+## 👤 Pierwsze Uruchomienie
+
+### Tworzenie Pierwszego Użytkownika
+
+Po uruchomieniu aplikacji utwórz pierwszego użytkownika przez Tinker:
+
+```bash
+php artisan tinker
+```
+
+W konsoli Tinker wykonaj:
+
+```php
+use App\Models\User;
+use App\Models\Firma;
+
+// Utworzenie firmy księgowej
+$firma = Firma::create([
+    'nazwa' => 'Biuro Rachunkowe ABC',
+    'nazwa_pelna' => 'Biuro Rachunkowe ABC Sp. z o.o.',
+    'nip' => '1234567890',
+    'adres' => 'ul. Główna 123',
+    'kod_pocztowy' => '00-001',
+    'miejscowosc' => 'Warszawa',
+    'telefon' => '+48 123 456 789',
+    'email' => 'biuro@abc.pl',
+    'miejsce_wystawienia' => 'Warszawa',
+    'prefix_faktury' => 'FV',
+    'typ' => 'ksiegowa'
+]);
+
+// Utworzenie administratora
+$admin = User::create([
+    'name' => 'Administrator',
+    'email' => 'admin@abc.pl',
+    'password' => bcrypt('admin123'),
+    'firma_id' => $firma->id,
+    'rola' => 'admin'
+]);
+
+// Utworzenie księgowego
+$ksiegowy = User::create([
+    'name' => 'Jan Kowalski',
+    'email' => 'ksiegowy@abc.pl',
+    'password' => bcrypt('ksiegowy123'),
+    'firma_id' => $firma->id,
+    'rola' => 'ksiegowy'
+]);
+
+echo "Użytkownicy utworzeni pomyślnie!\n";
+```
+
+## 🔐 Dane Dostępowe
+
+Po utworzeniu użytkowników testowych możesz zalogować się:
+
+### Administrator
+- **Email:** `admin@abc.pl`
+- **Hasło:** `admin123`
+- **Uprawnienia:** Pełne uprawnienia w systemie
+
+### Księgowy
+- **Email:** `ksiegowy@abc.pl`
+- **Hasło:** `ksiegowy123`
+- **Uprawnienia:** Zarządzanie firmami, klientami, dokumentami
+
+### Klient (do utworzenia przez admin/księgowego)
+- **Rola:** `klient`
+- **Uprawnienia:** Wystawianie dokumentów tylko dla własnej firmy
+
+## 📋 Dostępne Funkcjonalności
+
+### Dla Administratorów
+- Zarządzanie użytkownikami
+- Zarządzanie firmami
+- Zarządzanie wszystkimi dokumentami
+- Dostęp do statystyk
+
+### Dla Księgowych
+- Zarządzanie klientami firmy księgowej
+- Wystawianie dokumentów w imieniu klientów
+- Zarządzanie odbiorcami i artykułami
+- Generowanie raportów
+
+### Dla Klientów
+- Wystawianie dokumentów dla własnej firmy
+- Zarządzanie odbiorcami i artykułami
+- Przeglądanie własnych dokumentów
+
+## 🗂️ Struktura Modułów
+
+- **Dashboard** - Przegląd statystyk i szybkie akcje
+- **Dokumenty** - Faktury VAT, EU, rachunki
+- **Odbiorcy** - Baza klientów
+- **Artykuły** - Katalog produktów/usług
+- **Firmy** - Zarządzanie firmami (księgowe/klienci)
+- **Użytkownicy** - Zarządzanie kontami (tylko admin)
+
+## 🔧 Komendy Pomocnicze
+
+### Development
+```bash
+# Kompilacja w trybie watch
+npm run watch
+
+# Czyszczenie cache
+php artisan config:clear
+php artisan cache:clear
+php artisan route:clear
+
+# Sprawdzanie logów
+tail -f storage/logs/laravel.log
+```
+
+### Production
+```bash
+# Kompilacja dla produkcji
+npm run build
+
+# Optymalizacja Laravel
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+
+# Migracje na produkcji
+php artisan migrate --force
+```
+
+### Testy
+```bash
+# Uruchomienie testów
+php artisan test
+
+# Z pokryciem kodu
+php artisan test --coverage
+```
+
+## 📁 Struktura Projektu
+
+```
+├── app/
+│   ├── Http/Controllers/API/     # Kontrolery API
+│   ├── Models/                   # Modele Eloquent
+│   ├── Http/Middleware/          # Middleware
+│   └── Http/Requests/            # Klasy walidacji
+├── database/
+│   ├── migrations/               # Migracje bazy danych
+│   └── seeders/                  # Seedery
+├── resources/
+│   ├── js/
+│   │   ├── components/           # Komponenty Vue
+│   │   ├── views/               # Widoki/strony
+│   │   ├── stores/              # Store Pinia
+│   │   └── router/              # Routing Vue
+│   └── css/                     # Stylowanie
+└── routes/
+    ├── api.php                  # Trasy API
+    └── web.php                  # Trasy web
+```
+
+## 🌐 API Endpoints
+
+### Autentykacja
+- `POST /api/login` - Logowanie
+- `POST /api/register` - Rejestracja
+- `POST /api/logout` - Wylogowanie
+
+### Dokumenty
+- `GET /api/dokumenty` - Lista dokumentów
+- `POST /api/dokumenty` - Nowy dokument
+- `PUT /api/dokumenty/{id}` - Edycja dokumentu
+- `DELETE /api/dokumenty/{id}` - Usunięcie dokumentu
+- `POST /api/dokumenty/{id}/pdf` - Generowanie PDF
+
+### Zarządzanie
+- `GET /api/firmy` - Lista firm
+- `GET /api/odbiorcy` - Lista odbiorców
+- `GET /api/artykuly` - Lista artykułów
+- `GET /api/stats` - Statystyki
+
+## 🐛 Rozwiązywanie Problemów
+
+### Błędy Bazy Danych
+```bash
+# Sprawdź połączenie
+php artisan tinker
+>>> DB::connection()->getPdo();
+```
+
+### Błędy Kompilacji Frontend
+```bash
+# Wyczyść cache npm
+rm -rf node_modules package-lock.json
+npm install
+```
+
+### Błędy Uprawnień
+```bash
+# Linux/Mac
+sudo chown -R $USER:www-data storage
+sudo chown -R $USER:www-data bootstrap/cache
+chmod -R 775 storage
+chmod -R 775 bootstrap/cache
+```
+
+### Błędy CORS
+Sprawdź konfigurację w `config/cors.php` lub użyj tej samej domeny dla frontu i API.
+
+## 📝 Licencja
+
+Ten projekt jest objęty licencją MIT.
+
+## 🤝 Wsparcie
+
+W przypadku problemów:
+1. Sprawdź logi w `storage/logs/laravel.log`
+2. Sprawdź konsolę przeglądarki (F12)
+3. Uruchom `php artisan queue:work` jeśli używasz kolejek
+
+---
+
+**Powodzenia z systemem fakturowania! 🚀**

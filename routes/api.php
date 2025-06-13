@@ -10,15 +10,15 @@ use App\Http\Controllers\API\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
-|
-*/
+  |--------------------------------------------------------------------------
+  | API Routes
+  |--------------------------------------------------------------------------
+  |
+  | Here is where you can register API routes for your application. These
+  | routes are loaded by the RouteServiceProvider and all of them will
+  | be assigned to the "api" middleware group. Make something great!
+  |
+ */
 
 // Publiczne trasy uwierzytelniania
 Route::post('/register', [AuthController::class, 'register']);
@@ -38,11 +38,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Firmy
     Route::apiResource('firmy', FirmaController::class);
-    
+
     // Zarządzanie klientami (tylko dla firm księgowych)
     Route::middleware('check.permissions:ksiegowy,admin')->group(function () {
         Route::get('/firmy/klienci', [FirmaController::class, 'klienci']);
         Route::post('/firmy/klienci', [FirmaController::class, 'dodajKlienta']);
+        Route::post('/firmy/{id}/change-type', [FirmaController::class, 'changeType']);
     });
 
     // Odbiorcy
@@ -50,6 +51,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Artykuły
     Route::apiResource('artykuly', ArtykulController::class);
+    Route::post('/artykuly/{id}/toggle-public', [ArtykulController::class, 'togglePublic']);
+    Route::get('/artykuly-publiczne', [ArtykulController::class, 'getPubliczne']);
+    Route::post('/artykuly/{id}/duplicate', [ArtykulController::class, 'duplicate']);
 
     // Statystyki
     Route::get('/stats', [StatsController::class, 'index']);

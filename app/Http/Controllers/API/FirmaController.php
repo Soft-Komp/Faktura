@@ -22,6 +22,28 @@ public function klienci()
     return $this->sendResponse($klienci, 'Lista klientów pobrana pomyślnie.');
 }
 
+public function changeType(Request $request, $id)
+{
+    $firma = Firma::find($id);
+
+    if (is_null($firma)) {
+        return $this->sendError('Firma nie istnieje');
+    }
+
+    $validator = Validator::make($request->all(), [
+        'typ' => 'required|in:ksiegowa,klient'
+    ]);
+
+    if ($validator->fails()) {
+        return $this->sendError('Błąd walidacji', $validator->errors(), 422);
+    }
+
+    $firma->typ = $request->typ;
+    $firma->save();
+
+    return $this->sendResponse($firma, 'Typ firmy zmieniony pomyślnie');
+}
+
 // Metoda do dodawania nowego klienta
 public function dodajKlienta(Request $request)
 {

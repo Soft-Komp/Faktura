@@ -3,11 +3,11 @@ import axios from 'axios';
 
 export const useAuthStore = defineStore('auth', {
     state: () => ({
-        user: JSON.parse(localStorage.getItem('user')) || null,
-        token: localStorage.getItem('auth_token') || null,
-        loading: false,
-        error: null
-    }),
+            user: JSON.parse(localStorage.getItem('user')) || null,
+            token: localStorage.getItem('auth_token') || null,
+            loading: false,
+            error: null
+        }),
 
     getters: {
         isAuthenticated: (state) => !!state.token,
@@ -21,22 +21,22 @@ export const useAuthStore = defineStore('auth', {
         async login(credentials) {
             this.loading = true;
             this.error = null;
-            
+
             try {
                 const response = await axios.post('/login', credentials);
-                
+
                 if (response.data.success) {
                     this.token = response.data.data.token;
                     this.user = response.data.data.user;
-                    
+
                     localStorage.setItem('auth_token', this.token);
                     localStorage.setItem('user', JSON.stringify(this.user));
-                    
-                    return { success: true, data: response.data.data };
+
+                    return {success: true, data: response.data.data};
                 }
             } catch (error) {
                 this.error = error.response?.data?.message || 'Błąd logowania';
-                return { success: false, error: this.error };
+                return {success: false, error: this.error};
             } finally {
                 this.loading = false;
             }
@@ -45,22 +45,22 @@ export const useAuthStore = defineStore('auth', {
         async register(userData) {
             this.loading = true;
             this.error = null;
-            
+
             try {
                 const response = await axios.post('/register', userData);
-                
+
                 if (response.data.success) {
                     this.token = response.data.data.token;
                     this.user = response.data.data.user;
-                    
+
                     localStorage.setItem('auth_token', this.token);
                     localStorage.setItem('user', JSON.stringify(this.user));
-                    
-                    return { success: true, data: response.data.data };
+
+                    return {success: true, data: response.data.data};
                 }
             } catch (error) {
                 this.error = error.response?.data?.message || 'Błąd rejestracji';
-                return { success: false, error: this.error, errors: error.response?.data?.data };
+                return {success: false, error: this.error, errors: error.response?.data?.data};
             } finally {
                 this.loading = false;
             }
@@ -74,7 +74,7 @@ export const useAuthStore = defineStore('auth', {
                     console.error('Błąd wylogowania:', error);
                 }
             }
-            
+
             this.user = null;
             this.token = null;
             localStorage.removeItem('auth_token');
@@ -82,17 +82,18 @@ export const useAuthStore = defineStore('auth', {
         },
 
         async fetchProfile() {
-            if (!this.token) return { success: false, error: 'Brak tokenu' };
-            
+            if (!this.token)
+                return {success: false, error: 'Brak tokenu'};
+
             this.loading = true;
             this.error = null;
-            
+
             try {
                 const response = await axios.get('/profile');
                 if (response.data.success) {
                     this.user = response.data.data;
                     localStorage.setItem('user', JSON.stringify(this.user));
-                    return { success: true, data: this.user };
+                    return {success: true, data: this.user};
                 }
             } catch (error) {
                 console.error('Błąd pobierania profilu:', error);
@@ -100,9 +101,19 @@ export const useAuthStore = defineStore('auth', {
                 if (error.response?.status === 401) {
                     this.logout();
                 }
-                return { success: false, error: this.error };
+                return {success: false, error: this.error};
             } finally {
                 this.loading = false;
+            }
+        },
+
+        async refreshUserData() {
+            if (this.token) {
+                await this.fetchProfile();
+                // Wymuś odświeżenie komponentów
+                this.$patch({
+                    user: this.user
+                });
             }
         },
 

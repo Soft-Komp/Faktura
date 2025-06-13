@@ -24,7 +24,7 @@ return new class extends Migration
             $table->string('email', 100);
             $table->string('waluta_domyslna', 3)->default('PLN');
             $table->string('prefix_faktury', 10)->comment('prefix dla numeracji');
-            $table->enum('typ', ['ksiegowa', 'klient'])->default('klient')->comment('typ firmy');
+            $table->enum('typ', ['ksiegowa', 'klient', 'zwykla'])->default('klient')->comment('typ firmy');
             $table->foreignId('firma_ksiegowa_id')->nullable()->comment('ID firmy księgowej, jeśli to jest klient');
             $table->timestamps();
             
