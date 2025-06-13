@@ -357,10 +357,14 @@ export default {
       fetchDokumenty();
     };
     
-    const editDokument = (dokument) => {
-      selectedDokument.value = { ...dokument };
-      showEditModal.value = true;
-    };
+    const editDokument = async (dokument) => {
+  // Pobierz pełne dane dokumentu z pozycjami
+  const result = await dokumentyStore.fetchDokument(dokument.id);
+  if (result.success) {
+    selectedDokument.value = result.data;
+    showEditModal.value = true;
+  }
+};
     
     const confirmDelete = (dokument) => {
       selectedDokument.value = dokument;

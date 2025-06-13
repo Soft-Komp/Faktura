@@ -157,7 +157,7 @@ class DokumentHandlowyController extends BaseController {
                         'wartosc_netto' => $wartoscNetto,
                         'wartosc_vat' => $wartoscVat,
                         'wartosc_brutto' => $wartoscBrutto,
-                        'status' => 'wystawiony'
+                        'status' => 'wystawiona'  // ← ZMIEŃ TO
             ]);
 
             // Dodaj pozycje dokumentu

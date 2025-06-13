@@ -128,7 +128,16 @@
             </div>
             
             <div v-else>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Wystawiasz jako:</label>
+              <div class="flex justify-between items-center mb-2">
+                <label class="block text-sm font-medium text-gray-700">Wystawiasz jako:</label>
+                <button
+                  type="button"
+                  @click="refreshUserData"
+                  class="text-xs text-blue-600 hover:text-blue-800"
+                >
+                  Odśwież dane
+                </button>
+              </div>
               <div class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-900">
                 {{ firmaNazwa }}
               </div>
@@ -480,6 +489,7 @@ export default {
     
     const selectArtykul = (index, artykulId) => {
       const artykul = artykulyStore.getArtykulById(parseInt(artykulId));
+      
       if (artykul) {
         form.value.pozycje[index] = {
           ...form.value.pozycje[index],
@@ -513,12 +523,16 @@ export default {
     };
     
     const onFirmaChange = async () => {
-      // Odśwież artykuły po zmianie firmy
       await loadArtykuly();
     };
     
     const loadArtykuly = async () => {
       await artykulyStore.fetchArtykuly();
+    };
+    
+    const refreshUserData = async () => {
+      await authStore.fetchProfile();
+      await loadData();
     };
     
     const handleSubmit = async () => {
@@ -568,30 +582,40 @@ export default {
         authStore.isKsiegowy ? firmyStore.fetchKlienci() : Promise.resolve()
       ]);
       
-      // Set default values po załadowaniu danych
-      if (authStore.userFirma?.miejsce_wystawienia && !form.value.miejsce_wystawienia) {
-        form.value.miejsce_wystawienia = authStore.userFirma.miejsce_wystawienia;
-      }
-      
-      // Ustaw domyślną firmę tylko jeśli nie została jeszcze ustawiona
-      if (authStore.userFirma?.id && !form.value.id_firma) {
-        form.value.id_firma = authStore.userFirma.id;
+      // Set default values tylko jeśli nie jesteśmy w trybie edycji
+      if (!isEditMode.value) {
+        if (authStore.userFirma?.miejsce_wystawienia && !form.value.miejsce_wystawienia) {
+          form.value.miejsce_wystawienia = authStore.userFirma.miejsce_wystawienia;
+        }
+        
+        if (authStore.userFirma?.id && !form.value.id_firma) {
+          form.value.id_firma = authStore.userFirma.id;
+        }
       }
     };
     
     // Watch
-    watch(() => props.dokument, (newDokument) => {
+    watch(() => props.dokument, async (newDokument) => {
       if (newDokument) {
+        // Najpierw załaduj artykuły jeśli jeszcze nie są załadowane
+        if (artykulyStore.artykuly.length === 0) {
+          await loadArtykuly();
+        }
+        
         form.value = {
           ...newDokument,
-          pozycje: newDokument.pozycje || []
+          pozycje: newDokument.pozycje || [],
+          // Konwertuj daty do formatu YYYY-MM-DD
+          data_sprzedazy: newDokument.data_sprzedazy ? new Date(newDokument.data_sprzedazy).toISOString().split('T')[0] : '',
+          data_wystawienia: newDokument.data_wystawienia ? new Date(newDokument.data_wystawienia).toISOString().split('T')[0] : '',
+          termin_platnosci: newDokument.termin_platnosci ? new Date(newDokument.termin_platnosci).toISOString().split('T')[0] : ''
         };
       }
     }, { immediate: true });
     
     // Watch dla danych firmy użytkownika
     watch(() => authStore.userFirma, (newFirma) => {
-      if (newFirma && !form.value.id_firma) {
+      if (newFirma && !form.value.id_firma && !isEditMode.value) {
         form.value.id_firma = newFirma.id;
         if (newFirma.miejsce_wystawienia && !form.value.miejsce_wystawienia) {
           form.value.miejsce_wystawienia = newFirma.miejsce_wystawienia;
@@ -606,7 +630,7 @@ export default {
         await loadArtykuly(); // Przeładuj artykuły dla nowej firmy
         
         // Aktualizuj formularz
-        if (authStore.userFirma?.id) {
+        if (authStore.userFirma?.id && !isEditMode.value) {
           form.value.id_firma = authStore.userFirma.id;
           if (authStore.userFirma.miejsce_wystawienia) {
             form.value.miejsce_wystawienia = authStore.userFirma.miejsce_wystawienia;
@@ -616,10 +640,14 @@ export default {
     });
     
     // Lifecycle
-    onMounted(() => {
-      loadData();
-      if (!isEditMode.value) {
-        addPozycja(); // Start with one position
+    onMounted(async () => {
+      await loadData();
+      
+      // Jeśli tryb edycji, poczekaj na załadowanie dokumentu
+      if (isEditMode.value && props.dokument) {
+        // Dokument już jest załadowany przez watcher
+      } else if (!isEditMode.value) {
+        addPozycja(); // Start with one position for new documents
       }
     });
     
@@ -643,6 +671,7 @@ export default {
       calculatePozycja,
       formatPrice,
       onFirmaChange,
+      refreshUserData,
       handleSubmit
     };
   }
